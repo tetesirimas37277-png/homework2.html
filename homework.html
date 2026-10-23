@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Student Life Assistant - ผู้ช่วยวางแผนการเรียนและจัดการงานสำหรับนักศึกษา</title>
+    
+    <!-- Google Fonts: Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // กำหนดค่าคอนฟิกของ Tailwind ให้ตรงตามธีมสีที่ระบุ
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#1E3A8A',     // น้ำเงินเข้ม
+                            primary: '#2563EB',  // น้ำเงินสด
+                            light: '#EEF4FF',    // ฟ้าอ่อนพื้นหลัง
+                            accent: '#3B82F6',
+                        },
+                        status: {
+                            urgent: '#EF4444',   // แดง (ด่วน)
+                            today: '#06B6D4',    // ฟ้า (วันนี้)
+                            warning: '#F59E0B',  // ส้ม/เหลือง (ใกล้ถึง)
+                            success: '#10B981',  // เขียว (สำเร็จ/ปกติ)
+                        }
+                    },
+                    fontFamily: {
+                        prompt: ['Prompt', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles & CSS Variables -->
+    <style>
+        :root {
+            --primary-dark: #1E3A8A;
+            --primary: #2563EB;
+            --bg-light: #EEF4FF;
+            --urgent: #EF4444;
+            --today: #06B6D4;
+            --warning: #F59E0B;
+            --success: #10B981;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #F8FAFC;
+            color: #1E293B;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #EEF4FF;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #93C5FD;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563EB;
+        }
+
+        /* Animations */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .card-hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover-lift:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 25px -5px rgba(37, 99, 235, 0.15);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- ==========================================
+         1. NAVBAR (แถบเมนูด้านบน)
+    ========================================== -->
+    <nav class="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                
+                <!-- โลโก้ และชื่อเว็บ -->
+                <a href="#hero" class="flex items-center space-x-3 group">
+                    <div class="w-11 h-11 bg-brand-dark rounded-xl flex items-center justify-center text-white shadow-md shadow-blue-900/20 group-hover:bg-brand-primary transition-colors">
+                        <i class="fa-solid fa-graduation-cap text-xl"></i>
+                    </div>
+                    <span class="font-bold text-lg sm:text-xl text-brand-dark tracking-tight">
+                        AI Student Life <span class="text-brand-primary">Assistant</span>
+                    </span>
+                </a>
+
+                <!-- เมนูหน้าเว็บ (Desktop) -->
+                <div class="hidden md:flex items-center space-x-8 font-medium text-slate-600 text-sm">
+                    <a href="#hero" class="hover:text-brand-primary transition-colors py-1 border-b-2 border-transparent hover:border-brand-primary">หน้าแรก</a>
+                    <a href="#problems" class="hover:text-brand-primary transition-colors py-1 border-b-2 border-transparent hover:border-brand-primary">ปัญหาและแนวทาง</a>
+                    <a href="#features" class="hover:text-brand-primary transition-colors py-1 border-b-2 border-transparent hover:border-brand-primary">ฟีเจอร์หลัก</a>
+                    <a href="#demo" class="hover:text-brand-primary transition-colors py-1 border-b-2 border-transparent hover:border-brand-primary">ทดลองใช้งานจริง</a>
+                </div>
+
+                <!-- ปุ่มเข้าสู่ระบบ / โปรไฟล์นักศึกษา -->
+                <div class="hidden md:flex items-center space-x-3">
+                    <div id="userProfileBadge" class="hidden flex items-center space-x-3 bg-brand-light px-3.5 py-1.5 rounded-full border border-blue-200">
+                        <div class="w-8 h-8 rounded-full bg-brand-primary text-white flex items-center justify-center text-xs font-bold">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <div class="text-left text-xs">
+                            <p id="userNameDisplay" class="font-bold text-brand-dark line-clamp-1">ชื่อ นักศึกษา</p>
+                            <p id="userIdDisplay" class="text-slate-500 text-[10px]">66000000</p>
+                        </div>
+                        <button onclick="logout()" class="text-slate-400 hover:text-red-500 ml-1 text-xs" title="ออกจากระบบ">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </div>
+
+                    <button id="loginBtn" onclick="openLoginModal()" class="bg-brand-primary hover:bg-brand-dark text-white font-medium px-5 py-2.5 rounded-full shadow-md shadow-blue-500/20 hover:shadow-lg transition-all transform active:scale-95 flex items-center space-x-2">
+                        <i class="fa-solid fa-right-to-bracket text-sm"></i>
+                        <span>เข้าสู่ระบบ</span>
+                    </button>
+                </div>
+
+                <!-- ปุ่ม แฮมเบอร์เกอร์ (Mobile) -->
+                <div class="md:hidden flex items-center space-x-2">
+                    <button id="mobileMenuBtn" class="text-slate-600 focus:outline-none p-2 rounded-lg hover:bg-slate-100">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- เมนูป๊อปอัปบนมือถือ -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-b border-slate-100 px-4 pt-2 pb-6 space-y-3">
+            <a href="#hero" class="block py-2 text-slate-700 font-medium hover:text-brand-primary">หน้าแรก</a>
+            <a href="#problems" class="block py-2 text-slate-700 font-medium hover:text-brand-primary">ปัญหาและแนวทาง</a>
+            <a href="#features" class="block py-2 text-slate-700 font-medium hover:text-brand-primary">ฟีเจอร์หลัก</a>
+            <a href="#demo" class="block py-2 text-slate-700 font-medium hover:text-brand-primary">ทดลองใช้งานจริง</a>
+            
+            <div class="pt-2 border-t border-slate-100">
+                <button id="mobileLoginBtn" onclick="openLoginModal()" class="w-full bg-brand-primary text-white font-medium py-2.5 rounded-xl text-center shadow">
+                    เข้าสู่ระบบ
+                </button>
+                <div id="mobileUserBadge" class="hidden flex items-center justify-between bg-brand-light p-3 rounded-xl">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-full bg-brand-primary text-white flex items-center justify-center text-xs font-bold">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <div>
+                            <p id="mobileUserName" class="font-bold text-sm text-brand-dark">ชื่อ นักศึกษา</p>
+                            <p id="mobileUserId" class="text-xs text-slate-500">66000000</p>
+                        </div>
+                    </div>
+                    <button onclick="logout()" class="text-red-500 text-xs px-2 py-1 bg-white rounded border border-red-100">
+                        ออกจากระบบ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- ==========================================
+         2. HERO SECTION (ส่วนต้อนรับหลัก)
+    ========================================== -->
+    <section id="hero" class="relative pt-8 pb-20 lg:pt-16 lg:pb-28 bg-gradient-to-b from-brand-light via-white to-slate-50 overflow-hidden">
+        
+        <!-- ตัวหนังสือจางๆ มุมขวาบน Decor -->
+        <div class="absolute top-4 right-8 opacity-5 text-brand-dark font-extrabold text-6xl sm:text-8xl select-none pointer-events-non
